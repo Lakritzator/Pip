@@ -20,8 +20,6 @@
 // along with Pip. If not, see <http://www.gnu.org/licenses/lgpl.txt>.
 
 using System;
-using System.Globalization;
-using System.Threading;
 using System.Windows;
 using Autofac;
 using Caliburn.Micro;
@@ -64,11 +62,6 @@ namespace Pip
             StringEncryptionTypeConverter.RgbIv = "dlgjowejgogkklwj";
             StringEncryptionTypeConverter.RgbKey = "lsjvkwhvwujkagfauguwcsjgu2wueuff";
 
-            // Use this to setup the culture of your UI
-            var cultureInfo = CultureInfo.GetCultureInfo("en-US");
-            Thread.CurrentThread.CurrentCulture = cultureInfo;
-            Thread.CurrentThread.CurrentUICulture = cultureInfo;
-
             Log.Info().WriteLine("Windows version {0}", Environment.OSVersion.Version);
             var applicationConfig = ApplicationConfigBuilder
                 .Create()
@@ -87,7 +80,7 @@ namespace Pip
             if (application.WasAlreadyRunning)
             {
                 Log.Warn().WriteLine("{0} was already running.", applicationConfig.ApplicationName);
-                // Don't start the dapplication, exit with 0
+                // Don't start the dapplication, exit with -1
                 application.Shutdown(-1);
                 return -1;
             }

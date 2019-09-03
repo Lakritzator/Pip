@@ -38,11 +38,12 @@ namespace Pip.Modules
                 }
                 var screenBounds = DisplayInfo.ScreenBounds;
                 var pipBounds = new NativeSize(screenBounds.Width / 5, screenBounds.Height / 5);
-                var pipLocation = new NativePoint(screenBounds.Width - pipBounds.Width, screenBounds.Height - pipBounds.Height);
+                var pipLocation = new NativePoint(screenBounds.Width - pipBounds.Width, 0);
                 _thumbnailForm = new Form
                 {
                     Location = pipLocation,
                     Size = pipBounds,
+                    StartPosition = FormStartPosition.Manual,
                     TopMost = true,
                     FormBorderStyle = FormBorderStyle.None,
                     BackColor = Color.White,
@@ -66,6 +67,7 @@ namespace Pip.Modules
                 Dwm.DwmUpdateThumbnailProperties(phThumbnail, ref props);
 
                 _thumbnailForm.Show();
+                User32Api.BringWindowToTop(_thumbnailForm.Handle);
                 _thumbnailForm.Closed += (sender, args) => { Dwm.DwmUnregisterThumbnail(phThumbnail); };
             });
         }
