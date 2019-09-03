@@ -1,0 +1,40 @@
+﻿<mahapps:MetroWindow x:Class="Pip.Ui.Views.ConfigView"
+                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                     xmlns:mahapps="http://metro.mahapps.com/winfx/xaml/controls"
+                     xmlns:behaviors="clr-namespace:Dapplo.CaliburnMicro.Behaviors;assembly=Dapplo.CaliburnMicro"
+                     xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+                     xmlns:controls="clr-namespace:Dapplo.CaliburnMicro.Configuration.Controls;assembly=Dapplo.CaliburnMicro.Configuration"
+                     xmlns:viewModels="clr-namespace:Pip.Ui.ViewModels"
+                     mc:Ignorable="d"
+                     d:DataContext="{d:DesignInstance viewModels:ConfigViewModel,IsDesignTimeCreatable=False}"
+                     Width="500" Height="400">
+	<behaviors:FrameworkElementIcon.Value>
+		<iconPacks:PackIconMaterial Kind="Settings" Margin="10" Visibility="Visible" />
+	</behaviors:FrameworkElementIcon.Value>
+	<mahapps:MetroWindow.RightWindowCommands>
+		<mahapps:WindowCommands />
+	</mahapps:MetroWindow.RightWindowCommands>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*" />
+			<RowDefinition Height="30" />
+		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="200" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+		<StackPanel Grid.Column="0">
+			<TextBox x:Name="Filter" mahapps:TextBoxHelper.ClearTextButton="True"
+			         mahapps:TextBoxHelper.Watermark="{Binding ConfigTranslations.Filter}" />
+			<controls:ConfigurationTreeView />
+		</StackPanel>
+		<ContentControl x:Name="ActiveItem" Grid.Column="1" Grid.Row="0" />
+		<UniformGrid Grid.Column="1" Grid.Row="1" Rows="1" Columns="2">
+			<Button x:Name="Cancel" Content="{Binding CoreTranslations.Cancel}" />
+			<Button x:Name="Ok" Content="{Binding CoreTranslations.Ok}" />
+		</UniformGrid>
+	</Grid>
+</mahapps:MetroWindow>
