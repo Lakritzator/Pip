@@ -13,5 +13,13 @@ namespace Pip.Configuration
     {
         [DefaultValue("Ctrl + Shift + P")]
         string HotKey { get; set; }
+
+        [Description("The transparency of the pip window, 255 is fully opague.")]
+        [DefaultValue(255)]
+        byte Opacity { get; set; }
+
+        [Description("true to exclude the window border and title, default is false which means the whole window")]
+        [DefaultValue(false)]
+        bool SourceClientAreaOnly { get; set; }
     }
 }
