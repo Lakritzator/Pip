@@ -24,7 +24,6 @@ namespace Pip.Ui
 
         private readonly IPipConfiguration _pipConfiguration;
         private readonly IntPtr _hWnd;
-        private readonly SynchronizationContext _uiSynchronizationContext;
         private IntPtr _phThumbnail;
         private readonly IDisposable _windowMonitor;
 
@@ -34,7 +33,6 @@ namespace Pip.Ui
 
             _pipConfiguration = pipConfiguration;
             _hWnd = hWnd;
-            _uiSynchronizationContext = uiSynchronizationContext;
 
             // Make sure the PIP closes when the source closes
             _windowMonitor = WinEventHook.Create(WinEvents.EVENT_OBJECT_DESTROY)
@@ -102,15 +100,15 @@ namespace Pip.Ui
                     Close();
                     return;
                 }
-                Update();
+                UpdateThumbnail();
             }
             User32Api.BringWindowToTop(Handle);
         }
 
         /// <summary>
-        /// 
+        /// Change the thumbnail settings
         /// </summary>
-        public void Update()
+        public void UpdateThumbnail()
         {
             Opacity = 255d / Math.Max(0x01l, _pipConfiguration.Opacity);
             // Prepare the displaying of the Thumbnail
