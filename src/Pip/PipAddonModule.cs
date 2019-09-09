@@ -95,7 +95,6 @@ namespace Pip
                 .As<IConfigScreen>()
                 .SingleInstance();
 
-            
             builder
                 .RegisterType<ConfigureUiDefaults>()
                 .As<IService>()

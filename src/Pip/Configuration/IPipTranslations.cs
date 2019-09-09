@@ -27,5 +27,11 @@ namespace Pip.Configuration
         /// </summary>
         [DefaultValue("Configuration")]
         string Configuration { get; }
+
+        [DefaultValue("Opacity")]
+        string Opacity { get; }
+
+        [DefaultValue("Client area only")]
+        string ClientAreaOnly { get; }
     }
 }

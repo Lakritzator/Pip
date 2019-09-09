@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Windows.Forms;
+using Dapplo.CaliburnMicro.Extensions;
 using Dapplo.Windows.Common.Extensions;
 using Dapplo.Windows.Common.Structs;
 using Dapplo.Windows.Desktop;
@@ -26,12 +28,23 @@ namespace Pip.Ui
         private readonly IntPtr _hWnd;
         private IntPtr _phThumbnail;
         private readonly IDisposable _windowMonitor;
+        private readonly IDisposable _configurationMonitor;
+
+        private static readonly string[] PropertiesToMonitor = new[] {nameof(IPipConfiguration.Opacity), nameof(IPipConfiguration.SourceClientAreaOnly) };
 
         public ThumbnailForm(IPipConfiguration pipConfiguration, IntPtr hWnd, SynchronizationContext uiSynchronizationContext)
         {
             SetStyle(ControlStyles.SupportsTransparentBackColor, true);
-
             _pipConfiguration = pipConfiguration;
+
+            // MAke sure that changes to the settings are applied
+            _configurationMonitor = _pipConfiguration.OnPropertyChanged()
+                .Where(args => PropertiesToMonitor.Contains(args.PropertyName))
+                .Throttle(TimeSpan.FromMilliseconds(200))
+                .SubscribeOn(uiSynchronizationContext)
+                .ObserveOn(uiSynchronizationContext)
+                .Subscribe(args => UpdateThumbnail());
+
             _hWnd = hWnd;
 
             // Make sure the PIP closes when the source closes
@@ -55,7 +68,7 @@ namespace Pip.Ui
             TopMost = true;
             Text = "PIP";
             FormBorderStyle = FormBorderStyle.None;
-            BackColor = Color.White;
+            BackColor = Color.Gray;
             Enabled = false;
             ShowInTaskbar = false;
             Cursor = Cursors.Default;
@@ -81,6 +94,7 @@ namespace Pip.Ui
         protected override void OnClosed(EventArgs e)
         {
             _windowMonitor.Dispose();
+            _configurationMonitor.Dispose();
             Dwm.DwmUnregisterThumbnail(_phThumbnail);
             base.OnClosed(e);
         }
@@ -110,7 +124,7 @@ namespace Pip.Ui
         /// </summary>
         public void UpdateThumbnail()
         {
-            Opacity = 255d / Math.Max(0x01l, _pipConfiguration.Opacity);
+            Opacity = Math.Max(0x01l, _pipConfiguration.Opacity) / 255d;
             // Prepare the displaying of the Thumbnail
             var props = new DwmThumbnailProperties
             {

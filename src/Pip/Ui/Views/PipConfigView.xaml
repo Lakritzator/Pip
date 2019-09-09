@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mahapps="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:viewModels="clr-namespace:Pip.Ui.ViewModels"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300"
@@ -12,12 +11,9 @@
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="Auto" />
-			<RowDefinition Height="Auto" />
-			<RowDefinition Height="Auto" />
-			<RowDefinition Height="Auto" />
-			<RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
 
-		</Grid.RowDefinitions>
+        </Grid.RowDefinitions>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="200" />
 			<ColumnDefinition Width="*" />
@@ -25,22 +21,10 @@
 
 		<Label Content="{Binding PipTranslations.Title}" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" />
 
-		<CheckBox Content="{Binding PipTranslations.IsFiddlerEnabled}" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-		          IsChecked="{Binding FiddlerConfiguration.IsEnabled}" />
+		<CheckBox Content="{Binding PipTranslations.ClientAreaOnly}" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+		          IsChecked="{Binding PipConfiguration.SourceClientAreaOnly}" />
 
-		<CheckBox Content="{Binding PipTranslations.AutomaticallyAutomaticallyAuthenticate}" Grid.Row="2"
-		          Grid.Column="0" Grid.ColumnSpan="2" IsChecked="{Binding FiddlerConfiguration.AutomaticallyAuthenticate}" />
-
-		<CheckBox Content="{Binding PipTranslations.IsSystemProxy}" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
-		          IsChecked="{Binding FiddlerConfiguration.IsSystemProxy}" />
-
-		<Label Content="{Binding PipTranslations.ProxyPort}" Grid.Row="4" Grid.Column="0" />
-		<TextBox Text="{Binding FiddlerConfiguration.ProxyPort}" Grid.Row="4" Grid.Column="1"
-		         mahapps:TextBoxHelper.ClearTextButton="True"
-		         IsEnabled="{Binding FiddlerConfiguration.AutomaticallyAuthenticate}" />
-
-		<CheckBox  Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" IsChecked="{Binding FiddlerConfiguration.ManageProxyEnvironmentVariables}">
-			<TextBlock Text="{Binding PipTranslations.ManageHttpProxy}"/>
-		</CheckBox>
+        <Label Content="{Binding PipTranslations.Opacity}" Grid.Row="2" Grid.Column="0" />
+        <Slider Grid.Row="2" Grid.Column="1" Maximum="255" Minimum="10" Value="{Binding PipConfiguration.Opacity}" SmallChange="10" LargeChange="20" />
 	</Grid>
 </UserControl>
