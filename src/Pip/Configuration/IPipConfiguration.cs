@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using Dapplo.CaliburnMicro.Metro.Configuration;
 using Dapplo.Config.Ini;
+using Dapplo.Windows.Input.Enums;
 
 namespace Pip.Configuration
 {
@@ -11,8 +12,9 @@ namespace Pip.Configuration
     [Description("Pip configuration")]
     public interface IPipConfiguration : IIniSection, IMetroUiConfiguration
     {
-        [DefaultValue("Ctrl + Shift + P")]
-        string HotKey { get; set; }
+        [Description("The virtual keycodes which activate the PIP functionality, they can be found here: https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes")]
+        [DefaultValue(new []{VirtualKeyCode.LeftControl, VirtualKeyCode.LeftShift, VirtualKeyCode.KeyP})]
+        VirtualKeyCode[] HotKey { get; set; }
 
         [Description("The transparency of the pip window, 255 is fully opague.")]
         [DefaultValue(255)]

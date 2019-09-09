@@ -4,7 +4,6 @@ using System.Reactive.Linq;
 using System.Threading;
 using Dapplo.Addons;
 using Dapplo.Windows.Desktop;
-using Dapplo.Windows.Input.Enums;
 using Dapplo.Windows.Input.Keyboard;
 using Pip.Configuration;
 using Pip.Ui;
@@ -26,7 +25,13 @@ namespace Pip.Modules
         public void Startup()
         {
             var uiSynchronizationContext = SynchronizationContext.Current;
-            var keyHandler = new KeyCombinationHandler(VirtualKeyCode.LeftControl, VirtualKeyCode.LeftShift, VirtualKeyCode.KeyP);
+
+            var keyHandler = new KeyCombinationHandler(_pipConfiguration.HotKey)
+            {
+                CanRepeat = false,
+                IsPassThrough = false
+            };
+
             KeyboardHook.KeyboardEvents
                 .Where(keyHandler)
                 .SubscribeOn(uiSynchronizationContext)
