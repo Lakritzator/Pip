@@ -14,6 +14,7 @@ using Dapplo.Windows.Enums;
 using Dapplo.Windows.Messages;
 using Dapplo.Windows.User32;
 using Pip.Configuration;
+using Pip.Modules;
 
 namespace Pip.Ui
 {
@@ -25,17 +26,21 @@ namespace Pip.Ui
         private const int HtCaption = 0x2;
 
         private readonly IPipConfiguration _pipConfiguration;
+        private readonly LocationPool _locationPool;
         private readonly IntPtr _hWnd;
         private IntPtr _phThumbnail;
         private readonly IDisposable _windowMonitor;
         private readonly IDisposable _configurationMonitor;
+        private readonly NativeRect _thumbnailRect;
 
         private static readonly string[] PropertiesToMonitor = new[] {nameof(IPipConfiguration.Opacity), nameof(IPipConfiguration.SourceClientAreaOnly) };
 
-        public ThumbnailForm(IPipConfiguration pipConfiguration, IntPtr hWnd, SynchronizationContext uiSynchronizationContext)
+        public ThumbnailForm(IPipConfiguration pipConfiguration, LocationPool locationPool, IntPtr hWnd, SynchronizationContext uiSynchronizationContext)
         {
+            _thumbnailRect = locationPool.Pool();
             SetStyle(ControlStyles.SupportsTransparentBackColor, true);
             _pipConfiguration = pipConfiguration;
+            _locationPool = locationPool;
 
             // MAke sure that changes to the settings are applied
             _configurationMonitor = _pipConfiguration.OnPropertyChanged()
@@ -58,12 +63,9 @@ namespace Pip.Ui
                         Close();
                     }
                 });
-            var screenBounds = DisplayInfo.ScreenBounds;
-            var pipNativeSize = new NativeSize(screenBounds.Width / 5, screenBounds.Height / 5);
-            var pipLocation = new NativePoint(screenBounds.Width - pipNativeSize.Width, 0);
 
-            Location = pipLocation;
-            Size = pipNativeSize;
+            Location = _thumbnailRect.Location;
+            Size = _thumbnailRect.Size;
             StartPosition = FormStartPosition.Manual;
             TopMost = true;
             Text = "PIP";
@@ -80,11 +82,18 @@ namespace Pip.Ui
         /// <param name="message">Message</param>
         protected override void WndProc(ref Message message)
         {
-            base.WndProc(ref message);
-            if (message.Msg == (int) WindowsMessages.WM_NCHITTEST)
+            var windowsMessage = (WindowsMessages) message.Msg;
+            switch (windowsMessage)
             {
-                message.Result = (IntPtr)HtCaption;
+                case WindowsMessages.WM_NCHITTEST:
+                    message.Result = (IntPtr)HtCaption;
+                    return;
+                // As we make the total window the "non client" area, we check the Window message NC RBUTTON up
+                case WindowsMessages.WM_NCRBUTTONUP:
+                    Close();
+                    return;
             }
+            base.WndProc(ref message);
         }
 
         /// <summary>
@@ -93,6 +102,7 @@ namespace Pip.Ui
         /// <param name="e">EventArgs</param>
         protected override void OnClosed(EventArgs e)
         {
+            _locationPool.Return(_thumbnailRect);
             _windowMonitor.Dispose();
             _configurationMonitor.Dispose();
             Dwm.DwmUnregisterThumbnail(_phThumbnail);
@@ -122,9 +132,9 @@ namespace Pip.Ui
         /// <summary>
         /// Change the thumbnail settings
         /// </summary>
-        public void UpdateThumbnail()
+        private void UpdateThumbnail()
         {
-            Opacity = Math.Max(0x01l, _pipConfiguration.Opacity) / 255d;
+            Opacity = Math.Max((byte)0x01, _pipConfiguration.Opacity) / 255d;
             // Prepare the displaying of the Thumbnail
             var props = new DwmThumbnailProperties
             {

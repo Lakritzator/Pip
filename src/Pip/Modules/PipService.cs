@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading;
 using Dapplo.Addons;
@@ -14,11 +15,13 @@ namespace Pip.Modules
     public class PipService : IStartup
     {
         private readonly IPipConfiguration _pipConfiguration;
-        private ThumbnailForm _thumbnailForm;
+        private readonly LocationPool _locationPool;
+        private readonly Dictionary<IntPtr, ThumbnailForm> _thumbnailForms = new Dictionary<IntPtr, ThumbnailForm>();
 
-        public PipService(IPipConfiguration pipConfiguration)
+        public PipService(IPipConfiguration pipConfiguration, LocationPool locationPool)
         {
             _pipConfiguration = pipConfiguration;
+            _locationPool = locationPool;
         }
         public void Startup()
         {
@@ -30,23 +33,29 @@ namespace Pip.Modules
                 .ObserveOn(uiSynchronizationContext)
                 .Subscribe(keyboardHookEventArgs =>
             {
-                // If there is already a form, close it
-                if (_thumbnailForm != null)
-                {
-                    _thumbnailForm.Close();
-                    _thumbnailForm = null;
-                    return;
-                }
-
                 // Get the current active window
                 var pipSource = InteropWindowQuery.GetForegroundWindow();
                 while (pipSource.GetParent() != IntPtr.Zero)
                 {
                     pipSource = InteropWindowFactory.CreateFor(pipSource.GetParent());
                 }
-                _thumbnailForm = new ThumbnailForm(_pipConfiguration, pipSource.Handle, uiSynchronizationContext);
- 
-                _thumbnailForm.Show();
+
+                // If there is already a form, close it and remove it from the dictionary
+                if (_thumbnailForms.TryGetValue(pipSource.Handle, out var thumbnailForm))
+                {
+                    thumbnailForm.Close();
+                    _thumbnailForms.Remove(pipSource.Handle);
+                    return;
+                }
+
+                // Check if we have a location available
+                if (!_locationPool.HasAvailable)
+                {
+                    return;
+                }
+                thumbnailForm = new ThumbnailForm(_pipConfiguration, _locationPool, pipSource.Handle, uiSynchronizationContext);
+                _thumbnailForms[pipSource.Handle] = thumbnailForm;
+                thumbnailForm.Show();
             });
         }
     }

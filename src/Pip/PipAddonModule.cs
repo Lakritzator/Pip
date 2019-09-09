@@ -96,6 +96,10 @@ namespace Pip
                 .SingleInstance();
 
             builder
+                .RegisterType<LocationPool>()
+                .SingleInstance();
+
+            builder
                 .RegisterType<ConfigureUiDefaults>()
                 .As<IService>()
                 .SingleInstance();
