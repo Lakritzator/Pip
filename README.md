@@ -12,6 +12,6 @@ How does it work?
 * You can also close it by using the hotkey again on the same window as you used before
 * There is a configuration, when you can change the opaqueness and also if only the client area of the window is mirrored.
 
-Currently it supports 5 thumbnails simultanious, the default locations are fixed on the right side of the screen.
+Currently it supports 5 thumbnails simultaneous, the default locations are fixed on the right side of the screen.
 
 You can change the hotkey in the pip.ini located at %APPDATA%\Pip when it's not running.
