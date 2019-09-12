@@ -10,7 +10,7 @@ namespace Pip.Modules
 
         public LocationPool()
         {
-            var screenBounds = DisplayInfo.ScreenBounds;
+            var screenBounds = DisplayInfo.AllDisplayInfos[0].Bounds;
             var pipNativeSize = new NativeSize(screenBounds.Width / 5, screenBounds.Height / 5);
             for (int i = 0; i < 5; i++)
             {
