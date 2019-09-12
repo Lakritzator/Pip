@@ -19,7 +19,8 @@ using Pip.Modules;
 namespace Pip.Ui
 {
     /// <summary>
-    /// 
+    /// This is the Thumbnail which represents the "Picture" in the Picture.
+    /// It contains the logic to make the mirroring possible and handles mouse or configuration events. 
     /// </summary>
     public sealed class ThumbnailForm : Form
     {
@@ -35,6 +36,13 @@ namespace Pip.Ui
 
         private static readonly string[] PropertiesToMonitor = new[] {nameof(IPipConfiguration.Opacity), nameof(IPipConfiguration.SourceClientAreaOnly) };
 
+        /// <summary>
+        /// The constructor
+        /// </summary>
+        /// <param name="pipConfiguration">IPipConfiguration</param>
+        /// <param name="locationPool">LocationPool used to find a location</param>
+        /// <param name="hWnd">IntPtr with the hWnd to mirror</param>
+        /// <param name="uiSynchronizationContext">SynchronizationContext used to make it possible to modify the UI</param>
         public ThumbnailForm(IPipConfiguration pipConfiguration, LocationPool locationPool, IntPtr hWnd, SynchronizationContext uiSynchronizationContext)
         {
             _thumbnailRect = locationPool.Pool();

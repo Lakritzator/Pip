@@ -3,7 +3,6 @@ using System.ComponentModel;
 using Dapplo.Config.Ini;
 using Dapplo.Log.LogFile;
 
-
 namespace Pip.Configuration
 {
     /// <summary>
