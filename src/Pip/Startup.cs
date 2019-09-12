@@ -66,7 +66,7 @@ namespace Pip
             var applicationConfig = ApplicationConfigBuilder
                 .Create()
                 .WithApplicationName("Pip")
-                .WithMutex("AD5323E2-7614-46F2-8F80-2F8667970367")
+                .WithMutex("214222E8-9878-451F-BF9B-B788F591E7DD")
                 .WithoutCopyOfEmbeddedAssemblies()
                 .WithCaliburnMicro()
                 .BuildApplicationConfig();
