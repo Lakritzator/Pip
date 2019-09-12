@@ -11,7 +11,7 @@ using Dapplo.Windows.Desktop;
 using Dapplo.Windows.DesktopWindowsManager;
 using Dapplo.Windows.DesktopWindowsManager.Structs;
 using Dapplo.Windows.Enums;
-using Dapplo.Windows.Messages;
+using Dapplo.Windows.Messages.Enumerations;
 using Dapplo.Windows.User32;
 using Pip.Configuration;
 using Pip.Modules;
