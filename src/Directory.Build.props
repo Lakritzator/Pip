@@ -1,8 +1,8 @@
 ﻿<Project>
   <PropertyGroup>
     <Copyright>Copyright © Dapplo 2019</Copyright>
-    <Authors>Dapplo</Authors>
-    <RepositoryUrl>https://github.com/Dapplo/Pip</RepositoryUrl>
+    <Authors>Lakritzator</Authors>
+    <RepositoryUrl>https://github.com/Lakritzator/Pip</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <LangVersion>latest</LangVersion>
@@ -49,7 +49,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="!$(MSBuildProjectName.Contains('Test')) And !$(MSBuildProjectName.Contains('Demo'))">
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.0.28">
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.2.31">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>

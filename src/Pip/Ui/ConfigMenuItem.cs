@@ -25,7 +25,7 @@ namespace Pip.Ui
             Id = "B_Config";
             Icon = new PackIconMaterial
             {
-                Kind = PackIconMaterialKind.Settings
+                Kind = PackIconMaterialKind.Cog
             };
 
             ClickAction = item =>
