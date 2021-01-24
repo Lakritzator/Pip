@@ -1,4 +1,7 @@
-﻿using System.ComponentModel;
+﻿// Copyright (c) Dapplo and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System.ComponentModel;
 using Dapplo.CaliburnMicro.Translations;
 using Dapplo.Config.Language;
 
@@ -33,5 +36,8 @@ namespace Pip.Configuration
 
         [DefaultValue("Client area only")]
         string ClientAreaOnly { get; }
+
+        [DefaultValue("Press {0} to activate a PIP")]
+        string StartupNotify { get; }
     }
 }

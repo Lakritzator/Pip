@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Dapplo and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System;
 using System.Drawing;
 using System.Linq;
 using System.Reactive.Linq;
@@ -30,7 +33,8 @@ namespace Pip.Ui
         private readonly LocationPool _locationPool;
         private readonly IntPtr _hWnd;
         private IntPtr _phThumbnail;
-        private readonly IDisposable _windowMonitor;
+        private readonly IDisposable _windowCloseMonitor;
+        private readonly IDisposable _windowSizeChangeMonitor;
         private readonly IDisposable _configurationMonitor;
         private readonly NativeRect _thumbnailRect;
 
@@ -61,7 +65,7 @@ namespace Pip.Ui
             _hWnd = hWnd;
 
             // Make sure the PIP closes when the source closes
-            _windowMonitor = WinEventHook.Create(WinEvents.EVENT_OBJECT_DESTROY)
+            _windowCloseMonitor = WinEventHook.Create(WinEvents.EVENT_OBJECT_DESTROY)
                 .SubscribeOn(uiSynchronizationContext)
                 .ObserveOn(uiSynchronizationContext)
                 .Subscribe(info =>
@@ -69,6 +73,18 @@ namespace Pip.Ui
                     if (info.Handle == _hWnd)
                     {
                         Close();
+                    }
+                });
+
+            // Make sure the thumbnail changes when the window changes
+            _windowSizeChangeMonitor = WinEventHook.Create(WinEvents.EVENT_OBJECT_LOCATIONCHANGE)
+                .SubscribeOn(uiSynchronizationContext)
+                .ObserveOn(uiSynchronizationContext)
+                .Subscribe(info =>
+                {
+                    if (info.Handle == _hWnd)
+                    {
+                        UpdateThumbnail();
                     }
                 });
 
@@ -111,7 +127,8 @@ namespace Pip.Ui
         protected override void OnClosed(EventArgs e)
         {
             _locationPool.Return(_thumbnailRect);
-            _windowMonitor.Dispose();
+            _windowSizeChangeMonitor.Dispose();
+            _windowCloseMonitor.Dispose();
             _configurationMonitor.Dispose();
             Dwm.DwmUnregisterThumbnail(_phThumbnail);
             base.OnClosed(e);
@@ -142,6 +159,9 @@ namespace Pip.Ui
         /// </summary>
         private void UpdateThumbnail()
         {
+            // Retrieve the current information about the window, this could changed
+            var interopWindow = InteropWindowFactory.CreateFor(_hWnd).Fill();
+
             Opacity = Math.Max((byte)0x01, _pipConfiguration.Opacity) / 255d;
             // Prepare the displaying of the Thumbnail
             var props = new DwmThumbnailProperties
@@ -149,7 +169,10 @@ namespace Pip.Ui
                 Opacity = _pipConfiguration.Opacity,
                 Visible = true,
                 SourceClientAreaOnly = _pipConfiguration.SourceClientAreaOnly,
-                Destination = new NativeRect(0, 0, Width, Height)
+                // This is the size of the DMW Thumbnail
+                Destination = new NativeRect(0, 0, Width, Height),
+                // Here it would be possible to select only a part of the window, but this is slightly tricky of someone resizes the window
+                Source = new NativeRect(0,0, interopWindow.Info.Value.Bounds.Width, interopWindow.Info.Value.Bounds.Height)
             };
             Dwm.DwmUpdateThumbnailProperties(_phThumbnail, ref props);
         }

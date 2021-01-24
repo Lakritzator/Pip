@@ -1,4 +1,7 @@
-﻿using Dapplo.CaliburnMicro.Configuration;
+﻿// Copyright (c) Dapplo and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using Dapplo.CaliburnMicro.Configuration;
 using Dapplo.CaliburnMicro.Extensions;
 using Pip.Configuration;
 

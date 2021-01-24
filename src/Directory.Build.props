@@ -1,6 +1,6 @@
 ﻿<Project>
   <PropertyGroup>
-    <Copyright>Copyright © Dapplo 2019</Copyright>
+    <Copyright>Copyright © Dapplo 2019-2021</Copyright>
     <Authors>Lakritzator</Authors>
     <RepositoryUrl>https://github.com/Lakritzator/Pip</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -11,16 +11,15 @@
     <!-- Optional: Embed source files that are not tracked by the source control manager in the PDB -->
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <RuntimeIdentifiers>win10-x64;win10-x86;win-x64;win-x86</RuntimeIdentifiers>
-    <CopyLocalLockFileAssemblies Condition="'$(TargetFramework)' != 'net471'">true</CopyLocalLockFileAssemblies>
-    <DisableImplicitFrameworkReferences Condition="'$(TargetFramework)' == 'net471'">true</DisableImplicitFrameworkReferences>
-    <UseWPF>true</UseWPF>
-    <UseWindowsForms>false</UseWindowsForms>
+    <CopyLocalLockFileAssemblies Condition="$(TargetFramework.StartsWith('net4'))">true</CopyLocalLockFileAssemblies>
+    <DisableImplicitFrameworkReferences Condition="$(TargetFramework.StartsWith('net4'))">true</DisableImplicitFrameworkReferences>
   </PropertyGroup>
 
   <!-- ILLinker and single file settings -->
   <ItemGroup Condition="$(MSBuildProjectName) == 'Pip'">
     <TrimmerRootAssembly Include="netstandard" />
   </ItemGroup>
+
   <PropertyGroup Condition="$(MSBuildProjectName) == 'Pip'">
     <IncludeSymbolsInSingleFile>false</IncludeSymbolsInSingleFile>
     <ShowLinkerSizeComparison>true</ShowLinkerSizeComparison>
@@ -49,7 +48,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="!$(MSBuildProjectName.Contains('Test')) And !$(MSBuildProjectName.Contains('Demo'))">
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.2.31">
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
