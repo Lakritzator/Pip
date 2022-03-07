@@ -28,6 +28,8 @@ namespace Pip.Ui
     public sealed class ThumbnailForm : Form
     {
         private const int HtCaption = 0x2;
+        private const int HtBottomRight = 17;
+        private const int GripSize = 16;      // Grip size
 
         private readonly IPipConfiguration _pipConfiguration;
         private readonly LocationPool _locationPool;
@@ -54,7 +56,7 @@ namespace Pip.Ui
             _pipConfiguration = pipConfiguration;
             _locationPool = locationPool;
 
-            // MAke sure that changes to the settings are applied
+            // Make sure that changes to the settings are applied
             _configurationMonitor = _pipConfiguration.OnPropertyChanged()
                 .Where(args => PropertiesToMonitor.Contains(args.PropertyName))
                 .Throttle(TimeSpan.FromMilliseconds(200))
@@ -97,7 +99,6 @@ namespace Pip.Ui
             BackColor = Color.Gray;
             Enabled = false;
             ShowInTaskbar = false;
-            Cursor = Cursors.Default;
         }
 
         /// <summary>
@@ -110,12 +111,22 @@ namespace Pip.Ui
             switch (windowsMessage)
             {
                 case WindowsMessages.WM_NCHITTEST:
+                    Point pos = new Point(message.LParam.ToInt32());
+                    pos = this.PointToClient(pos);
+                    if (pos.X >= this.ClientSize.Width - GripSize && pos.Y >= this.ClientSize.Height - GripSize)
+                    {
+                        message.Result = (IntPtr)HtBottomRight;
+                        return;
+                    }
                     message.Result = (IntPtr)HtCaption;
                     return;
                 // As we make the total window the "non client" area, we check the Window message NC RBUTTON up
                 case WindowsMessages.WM_NCRBUTTONUP:
                     Close();
                     return;
+                case WindowsMessages.WM_SIZE:
+                    UpdateThumbnail();
+                    break;
             }
             base.WndProc(ref message);
         }
@@ -161,6 +172,7 @@ namespace Pip.Ui
         {
             // Retrieve the current information about the window, this could changed
             var interopWindow = InteropWindowFactory.CreateFor(_hWnd).Fill();
+            var sourceBounds = interopWindow.Info.Value.Bounds;
 
             Opacity = Math.Max((byte)0x01, _pipConfiguration.Opacity) / 255d;
             // Prepare the displaying of the Thumbnail
@@ -172,7 +184,7 @@ namespace Pip.Ui
                 // This is the size of the DMW Thumbnail
                 Destination = new NativeRect(0, 0, Width, Height),
                 // Here it would be possible to select only a part of the window, but this is slightly tricky of someone resizes the window
-                Source = new NativeRect(0,0, interopWindow.Info.Value.Bounds.Width, interopWindow.Info.Value.Bounds.Height)
+                Source = new NativeRect(0,0, sourceBounds.Width, sourceBounds.Height)
             };
             Dwm.DwmUpdateThumbnailProperties(_phThumbnail, ref props);
         }

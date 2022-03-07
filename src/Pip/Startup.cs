@@ -49,8 +49,11 @@ namespace Pip
                 .Create()
                 .WithApplicationName("Pip")
                 .WithMutex("214222E8-9878-451F-BF9B-B788F591E7DD")
-                .WithoutCopyOfEmbeddedAssemblies()
                 .WithCaliburnMicro()
+                .WithoutCopyOfEmbeddedAssemblies()
+#if NET471
+                .WithoutCopyOfAssembliesToProbingPath()
+#endif
                 .BuildApplicationConfig();
 
             var application = new Dapplication(applicationConfig)

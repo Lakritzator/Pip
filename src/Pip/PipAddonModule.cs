@@ -11,6 +11,7 @@ using Dapplo.CaliburnMicro.Metro.Configuration;
 using Dapplo.CaliburnMicro.NotifyIconWpf;
 using Dapplo.Config.Ini;
 using Dapplo.Config.Language;
+using Dapplo.Windows.Input.Enums;
 using Pip.Configuration;
 using Pip.Modules;
 using Pip.Ui.ViewModels;
@@ -57,14 +58,17 @@ namespace Pip
 
                     metroConfiguration.RegisterAfterLoad(iniSection =>
                     {
-                        var metroConfig = iniSection as IMetroUiConfiguration;
-                        if (metroConfig == null)
+                        if (iniSection is IMetroUiConfiguration metroConfig)
                         {
-                            return;
+                            metroThemeManager.ChangeTheme(metroConfig.Theme, metroConfig.ThemeColor);
+                        }
+                        if (iniSection is IPipConfiguration pipConfiguration)
+                        {
+                            pipConfiguration.HotKey ??= new[] { VirtualKeyCode.LeftControl, VirtualKeyCode.LeftShift, VirtualKeyCode.KeyP };
                         }
 
-                        metroThemeManager.ChangeTheme(metroConfig.Theme, metroConfig.ThemeColor);
                     });
+                    
                     return metroConfiguration;
                 })
                 .As<IMetroUiConfiguration>()
