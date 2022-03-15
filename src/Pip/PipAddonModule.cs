@@ -86,6 +86,11 @@ namespace Pip
                 .RegisterType<LocationPool>()
                 .SingleInstance();
 
+
+            builder
+                .RegisterType<ThumbnailRegistry>()
+                .SingleInstance();
+
             builder
                 .RegisterType<ConfigureUiDefaults>()
                 .As<IService>()

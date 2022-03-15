@@ -34,6 +34,7 @@ namespace Pip.Ui
         private readonly IPipConfiguration _pipConfiguration;
         private readonly LocationPool _locationPool;
         private readonly IntPtr _hWnd;
+        private readonly ThumbnailRegistry _thumbnailRegistry;
         private IntPtr _phThumbnail;
         private readonly IDisposable _windowCloseMonitor;
         private readonly IDisposable _windowSizeChangeMonitor;
@@ -49,7 +50,8 @@ namespace Pip.Ui
         /// <param name="locationPool">LocationPool used to find a location</param>
         /// <param name="hWnd">IntPtr with the hWnd to mirror</param>
         /// <param name="uiSynchronizationContext">SynchronizationContext used to make it possible to modify the UI</param>
-        public ThumbnailForm(IPipConfiguration pipConfiguration, LocationPool locationPool, IntPtr hWnd, SynchronizationContext uiSynchronizationContext)
+        /// <param name="thumbnailRegistry">ThumbnailRegistry is used to register and de-register the thumbnails</param>
+        public ThumbnailForm(IPipConfiguration pipConfiguration, LocationPool locationPool, IntPtr hWnd, SynchronizationContext uiSynchronizationContext, ThumbnailRegistry thumbnailRegistry)
         {
             _thumbnailRect = locationPool.Pool();
             SetStyle(ControlStyles.SupportsTransparentBackColor, true);
@@ -65,6 +67,7 @@ namespace Pip.Ui
                 .Subscribe(args => UpdateThumbnail());
 
             _hWnd = hWnd;
+            _thumbnailRegistry = thumbnailRegistry;
 
             // Make sure the PIP closes when the source closes
             _windowCloseMonitor = WinEventHook.Create(WinEvents.EVENT_OBJECT_DESTROY)
@@ -142,6 +145,7 @@ namespace Pip.Ui
             _windowCloseMonitor.Dispose();
             _configurationMonitor.Dispose();
             Dwm.DwmUnregisterThumbnail(_phThumbnail);
+            _thumbnailRegistry.Thumbnails.Remove(_hWnd);
             base.OnClosed(e);
         }
 
@@ -170,10 +174,6 @@ namespace Pip.Ui
         /// </summary>
         private void UpdateThumbnail()
         {
-            // Retrieve the current information about the window, this could changed
-            var interopWindow = InteropWindowFactory.CreateFor(_hWnd).Fill();
-            var sourceBounds = interopWindow.Info.Value.Bounds;
-
             Opacity = Math.Max((byte)0x01, _pipConfiguration.Opacity) / 255d;
             // Prepare the displaying of the Thumbnail
             var props = new DwmThumbnailProperties
@@ -184,7 +184,7 @@ namespace Pip.Ui
                 // This is the size of the DMW Thumbnail
                 Destination = new NativeRect(0, 0, Width, Height),
                 // Here it would be possible to select only a part of the window, but this is slightly tricky of someone resizes the window
-                Source = new NativeRect(0,0, sourceBounds.Width, sourceBounds.Height)
+                // Source = new NativeRect(0,0, sourceBounds.Width, sourceBounds.Height)
             };
             Dwm.DwmUpdateThumbnailProperties(_phThumbnail, ref props);
         }

@@ -18,12 +18,13 @@ namespace Pip.Modules
     {
         private readonly IPipConfiguration _pipConfiguration;
         private readonly LocationPool _locationPool;
-        private readonly Dictionary<IntPtr, ThumbnailForm> _thumbnailForms = new Dictionary<IntPtr, ThumbnailForm>();
+        private readonly ThumbnailRegistry _thumbnailRegistry;
 
-        public PipService(IPipConfiguration pipConfiguration, LocationPool locationPool)
+        public PipService(IPipConfiguration pipConfiguration, LocationPool locationPool, ThumbnailRegistry thumbnailRegistry)
         {
             _pipConfiguration = pipConfiguration;
             _locationPool = locationPool;
+            _thumbnailRegistry = thumbnailRegistry;
         }
         public void Startup()
         {
@@ -49,10 +50,10 @@ namespace Pip.Modules
                 }
 
                 // If there is already a form, close it and remove it from the dictionary
-                if (_thumbnailForms.TryGetValue(pipSource.Handle, out var thumbnailForm))
+                if (_thumbnailRegistry.Thumbnails.TryGetValue(pipSource.Handle, out var thumbnailForm))
                 {
                     thumbnailForm.Close();
-                    _thumbnailForms.Remove(pipSource.Handle);
+                    _thumbnailRegistry.Thumbnails.Remove(pipSource.Handle);
                     return;
                 }
 
@@ -61,8 +62,8 @@ namespace Pip.Modules
                 {
                     return;
                 }
-                thumbnailForm = new ThumbnailForm(_pipConfiguration, _locationPool, pipSource.Handle, uiSynchronizationContext);
-                _thumbnailForms[pipSource.Handle] = thumbnailForm;
+                thumbnailForm = new ThumbnailForm(_pipConfiguration, _locationPool, pipSource.Handle, uiSynchronizationContext, _thumbnailRegistry);
+                _thumbnailRegistry.Thumbnails[pipSource.Handle] = thumbnailForm;
                 thumbnailForm.Show();
             });
         }
